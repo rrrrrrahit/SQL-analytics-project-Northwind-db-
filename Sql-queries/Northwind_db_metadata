@@ -1,0 +1,142 @@
+-- DATABASE: Northwind
+
+-- 1. Customers
+CREATE TABLE Customers (
+    CustomerID CHAR(5) PRIMARY KEY,
+    CompanyName NVARCHAR(40) NOT NULL,
+    ContactName NVARCHAR(30),
+    ContactTitle NVARCHAR(30),
+    Address NVARCHAR(60),
+    City NVARCHAR(15),
+    Region NVARCHAR(15),
+    PostalCode NVARCHAR(10),
+    Country NVARCHAR(15),
+    Phone NVARCHAR(24),
+    Fax NVARCHAR(24)
+);
+
+-- 2. Employees
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY,
+    LastName NVARCHAR(20) NOT NULL,
+    FirstName NVARCHAR(10) NOT NULL,
+    Title NVARCHAR(30),
+    TitleOfCourtesy NVARCHAR(25),
+    BirthDate DATETIME,
+    HireDate DATETIME,
+    Address NVARCHAR(60),
+    City NVARCHAR(15),
+    Region NVARCHAR(15),
+    PostalCode NVARCHAR(10),
+    Country NVARCHAR(15),
+    HomePhone NVARCHAR(24),
+    Extension NVARCHAR(4),
+    Photo IMAGE,
+    Notes NTEXT,
+    ReportsTo INT,
+    PhotoPath NVARCHAR(255),
+    FOREIGN KEY (ReportsTo) REFERENCES Employees(EmployeeID)
+);
+
+-- 3. Categories
+CREATE TABLE Categories (
+    CategoryID INT PRIMARY KEY,
+    CategoryName NVARCHAR(15) NOT NULL,
+    Description NTEXT,
+    Picture IMAGE
+);
+
+-- 4. Suppliers
+CREATE TABLE Suppliers (
+    SupplierID INT PRIMARY KEY,
+    CompanyName NVARCHAR(40) NOT NULL,
+    ContactName NVARCHAR(30),
+    ContactTitle NVARCHAR(30),
+    Address NVARCHAR(60),
+    City NVARCHAR(15),
+    Region NVARCHAR(15),
+    PostalCode NVARCHAR(10),
+    Country NVARCHAR(15),
+    Phone NVARCHAR(24),
+    Fax NVARCHAR(24),
+    HomePage NTEXT
+);
+
+-- 5. Products
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY,
+    ProductName NVARCHAR(40) NOT NULL,
+    SupplierID INT,
+    CategoryID INT,
+    QuantityPerUnit NVARCHAR(20),
+    UnitPrice MONEY,
+    UnitsInStock SMALLINT,
+    UnitsOnOrder SMALLINT,
+    ReorderLevel SMALLINT,
+    Discontinued BIT,
+    FOREIGN KEY (SupplierID) REFERENCES Suppliers(SupplierID),
+    FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID)
+);
+
+-- 6. Orders
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY,
+    CustomerID CHAR(5),
+    EmployeeID INT,
+    OrderDate DATETIME,
+    RequiredDate DATETIME,
+    ShippedDate DATETIME,
+    ShipVia INT,
+    Freight MONEY,
+    ShipName NVARCHAR(40),
+    ShipAddress NVARCHAR(60),
+    ShipCity NVARCHAR(15),
+    ShipRegion NVARCHAR(15),
+    ShipPostalCode NVARCHAR(10),
+    ShipCountry NVARCHAR(15),
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
+    FOREIGN KEY (EmployeeID) REFERENCES Employees(EmployeeID),
+    FOREIGN KEY (ShipVia) REFERENCES Shippers(ShipperID)
+);
+
+-- 7. OrderDetails
+CREATE TABLE OrderDetails (
+    OrderID INT,
+    ProductID INT,
+    UnitPrice MONEY NOT NULL,
+    Quantity SMALLINT NOT NULL,
+    Discount REAL NOT NULL,
+    PRIMARY KEY (OrderID, ProductID),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+-- 8. Shippers
+CREATE TABLE Shippers (
+    ShipperID INT PRIMARY KEY,
+    CompanyName NVARCHAR(40) NOT NULL,
+    Phone NVARCHAR(24)
+);
+
+-- 9. Regions
+CREATE TABLE Regions (
+    RegionID INT PRIMARY KEY,
+    RegionDescription NVARCHAR(50) NOT NULL
+);
+
+-- 10. Territories
+CREATE TABLE Territories (
+    TerritoryID NVARCHAR(20) PRIMARY KEY,
+    TerritoryDescription NVARCHAR(50) NOT NULL,
+    RegionID INT,
+    FOREIGN KEY (RegionID) REFERENCES Regions(RegionID)
+);
+
+-- 11. EmployeeTerritories (many-to-many link)
+CREATE TABLE EmployeeTerritories (
+    EmployeeID INT,
+    TerritoryID NVARCHAR(20),
+    PRIMARY KEY (EmployeeID, TerritoryID),
+    FOREIGN KEY (EmployeeID) REFERENCES Employees(EmployeeID),
+    FOREIGN KEY (TerritoryID) REFERENCES Territories(TerritoryID)
+);
